@@ -91,6 +91,10 @@ function createUser() {
     const user = new User(name, email, null, null, city, cell, null);
     arrayUsers.addUser(user);
 
+    if(isAnyInputEmpty() == true) {
+        sendErrorMsg("Preencha todos os campos");
+    } 
+    
     clearInputs();
 }
 
@@ -168,7 +172,7 @@ function clearInputs() {
     document.getElementById("address").value == ""
     document.getElementById("phone") == ""
     document.getElementById("email").value == ""
-    document.getElementById("cpf").value == ""   
+    document.getElementById("cpf").value == "";
 }
 
 function showUsers() {
