@@ -1,9 +1,9 @@
 class User {
-    constructor(name, email, age, sign, city, cell, cpf) {
+    constructor(name, email, age, city, cell, cpf) {
         this.name = name;
         this.email = email;
-        this.age = age;
-        this.sign = sign;
+        this.age = this.getAge(age);
+        this.sign = this.getSign(age)
         this.city = city;
         this.cell = cell;
         this.cpf = cpf;
@@ -57,15 +57,6 @@ class User {
             return "Sagitário ♐";
         }
     }
-
-    getCPF() {
-        valida_cpf(cpf);
-        if (valida_cpf(cpf) == true) {
-            return cpf
-        } else {
-            return sendErrorMsg("Digite um cpf válido");
-        }
-    }
 }
 
 class AllUser {
@@ -88,14 +79,23 @@ function createUser() {
     let email = document.getElementById("email").value;
     let cpf = document.getElementById("cpf").value;
 
-    const user = new User(name, email, null, null, city, cell, null);
-    arrayUsers.addUser(user);
+    const user = new User(name, email, age, city, cell, cpf);
 
     if(isAnyInputEmpty() == true) {
         sendErrorMsg("Preencha todos os campos");
-    } 
-    
-    clearInputs();
+    } else {
+        if(valida_cpf(cpf) == false) {
+            sendErrorMsg("Coloque um cpf válido");
+        } else {
+            if(isUserAlreadyRegistered(cpf) == true) {
+                sendErrorMsg("Alguém já cadastrou este CPF")
+            } else {
+                clearInputs();
+                arrayUsers.addUser(user);
+            }
+        }
+    }
+
 }
 
 function valida_cpf(cpf) {
@@ -161,8 +161,12 @@ function isAnyInputEmpty() {
 }
 
 function isUserAlreadyRegistered(cpf) {
-    arrayUsers.forEach(cpf => {
-        
+    arrayUsers.forEach((index, cpf) => {
+        if(arrayUsers[index].cpf == arrayUsers[index].cpf) {
+            return true
+        } else {
+            return false
+        }
     });
 }
 
