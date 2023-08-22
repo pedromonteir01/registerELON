@@ -7,23 +7,28 @@ class User {
         this.city = city;
         this.cell = cell;
         this.cpf = cpf;
-        this.possible_Client = this.possible_Client()
+        this.possible_Client = this.possibleClient(age);
     }
 
-    getAge(aniversaryY, aniversaryM, aniversaryD) {
-        let today = new Date,
-            todayYear = today.getFullYear(),
-            todayMonth = today.getMonth() + 1,
-            todayDay = today.getDay(),
+    getAge() {
+        let today = new Date();
+        let todayYear = today.getFullYear();
+        let todayMonth = today.getMonth();
+        let todayDay = today.getDay();
+        let birthdate = new Date(this.age);
+        let birthdateY = birthdate.getFullYear();
+        let birthdateM = birthdate.getMonth();
+        let birthdateD = birthdate.getDay();
 
-            age = todayYear - aniversaryY;
+        let counter = todayYear - birthdateY;
 
-
-        if (todayMonth < aniversaryM || todayMonth == todayMonth && todayDay > aniversaryD) {
-            age--;
+        if (todayMonth < birthdateM || todayMonth == birthdateM && todayDay < birthdateD) {
+            counter--;
         }
 
-        return age < 0 ? 0 : age;
+        console.log(counter);
+
+        return counter < 0 ? 0 : counter;
     }
 
     getSign() {
@@ -60,8 +65,12 @@ class User {
         }
     }
 
-    possible_Client() {
-        possibleClient(this.age);
+    possibleClient(age) {
+        if (age == 18 && age <= 31) {
+            return `Sim`
+        } else {
+            return `Não`
+        }
     }
 }
 
@@ -71,37 +80,38 @@ class AllUsers {
     }
 
     addUser(user) {
-        this.listUsers.push(user);
+        if (isAnyInputEmpty()) {
+            sendErrorMsg(`Preencha todos os campos`);
+        } else if (!valida_cpf(user.cpf)) {
+            sendErrorMsg(`CPF inválido`);
+        } else if (isUserAlreadyRegistered(user.cpf)) {
+            sendErrorMsg(`CPF já cadastrado`);
+        } else {
+            this.listUsers.push(user);
+            sendSuccessMsg(`Usuário cadastrado com sucesso!`)
+            clearInputs();
+            showList();
+            countUsers();
+        }
+    }
+
+    countUsers() {
+        return this.listUsers.length;
     }
 }
 
 const arrayUsers = new AllUsers();
 
 function createUser() {
-    if (isAnyInputEmpty() == true) {
-        sendErrorMsg("Preencha todos os campos");
-    } else {
-        let name = document.getElementById("name").value;
-        let age = document.getElementById("birthdate").value;
-        let city = document.getElementById("address").value;
-        let cell = document.getElementById("phone").value;
-        let email = document.getElementById("email").value;
-        let cpf = document.getElementById("cpf").value;
+    let name = document.getElementById("name").value;
+    let age = document.getElementById("birthdate").value;
+    let city = document.getElementById("address").value;
+    let cell = document.getElementById("phone").value;
+    let email = document.getElementById("email").value;
+    let cpf = document.getElementById("cpf").value;
 
-        if (valida_cpf(cpf) == false) {
-            sendErrorMsg("Coloque um cpf válido");
-        } else {
-            const user = new User(name, email, age, city, cell, cpf);
-            arrayUsers.addUser(user);
-            if (isUserAlreadyRegistered(cpf) == true) {
-                sendErrorMsg("Alguém já cadastrou este CPF")
-            } else {
-                countUsers();
-                showList();
-                clearInputs();
-            }
-        }
-    }
+    const user = new User(name, email, age, city, cell, cpf);
+    arrayUsers.addUser(user);
 }
 
 function valida_cpf(cpf) {
@@ -168,7 +178,11 @@ function isAnyInputEmpty() {
 
 function isUserAlreadyRegistered(cpf) {
     arrayUsers.listUsers.forEach((user) => {
-        console.log(user.cpf);
+        if(user.cpf == user.cpf) {
+            return true
+        } else {
+            return false 
+        }
     });
 }
 
@@ -179,8 +193,6 @@ function clearInputs() {
     document.getElementById("phone") == ""
     document.getElementById("email").value == ""
     document.getElementById("cpf").value == "";
-
-    return
 }
 
 function showUsers() {
@@ -193,19 +205,6 @@ function showRegister() {
     document.getElementById("main-div").classList.remove("hidden");
 }
 
-
-function possibleClient(age) {
-    if (age == 18 && age <= 31) {
-        return true
-    } else {
-        return false
-    }
-}
-
-function countUsers() {
-    document.getElementById("contador").innerHTML = `Contador: ${arrayUsers.listUsers.length}`
-}
-
 function showList() {
     document.getElementById("user-list").classList.add("list-eachUser")
     arrayUsers.listUsers.forEach(user => {
@@ -216,6 +215,7 @@ function showList() {
             Endereço: ${user.city}
             Celular: ${formatedCellphone(user.cell)}
             CPF: ${formatedCPF(user.cpf)}
+            Possível cliente?: ${user.possible_Clien}
         `
     });
 }
