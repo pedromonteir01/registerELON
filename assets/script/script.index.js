@@ -1,13 +1,14 @@
 class User {
-    constructor(name, email, age, city, cell, cpf) {
+    constructor(name, email, birthdate, city, cell, cpf) {
         this.name = name;
         this.email = email;
-        this.age = this.getAge(age);
-        this.sign = this.getSign()
+        this.birthdate = birthdate;
+        this.age = this.getAge();
+        this.sign = this.getSign(this.age)
         this.city = city;
         this.cell = cell;
         this.cpf = cpf;
-        this.possible_Client = this.possibleClient(age);
+        this.possible_Client = this.possibleClient(this.age);
     }
 
     getAge() {
@@ -15,7 +16,7 @@ class User {
         let todayYear = today.getFullYear();
         let todayMonth = today.getMonth();
         let todayDay = today.getDay();
-        let birthdate = new Date(this.age);
+        let birthdate = new Date(this.birthdate);
         let birthdateY = birthdate.getFullYear();
         let birthdateM = birthdate.getMonth();
         let birthdateD = birthdate.getDay();
@@ -32,8 +33,7 @@ class User {
     }
 
     getSign() {
-        let birthdate = new Date(this.age);
-        console.log(birthdate);
+        let birthdate = new Date(this.birthdate);
         let day = birthdate.getDate();
         let month = birthdate.getMonth() + 1;
         console.log("Passou pelo getSigno() da class User");
@@ -81,23 +81,27 @@ class AllUsers {
 
     addUser(user) {
         if (isAnyInputEmpty()) {
-            sendErrorMsg(`Preencha todos os campos`);
+            return sendErrorMsg(`Preencha todos os campos`);
         } else if (!valida_cpf(user.cpf)) {
-            sendErrorMsg(`CPF inválido`);
+            return sendErrorMsg(`CPF inválido`);
         } else if (isUserAlreadyRegistered(user.cpf)) {
-            sendErrorMsg(`CPF já cadastrado`);
+            return sendErrorMsg(`CPF já cadastrado`);
         } else {
             this.listUsers.push(user);
             sendSuccessMsg(`Usuário cadastrado com sucesso!`)
             clearInputs();
             showList();
-            countUsers();
         }
     }
 
     countUsers() {
         return this.listUsers.length;
     }
+
+    getAllUser() {
+        return this.listUsers;
+    }
+
 }
 
 const arrayUsers = new AllUsers();
@@ -176,23 +180,25 @@ function isAnyInputEmpty() {
     }
 }
 
-function isUserAlreadyRegistered(cpf) {
+function isUserAlreadyRegistered(valor) {
+    let isAlready =  false;
     arrayUsers.listUsers.forEach((user) => {
-        if(user.cpf == user.cpf) {
-            return true
-        } else {
-            return false 
+        if (user.cpf == valor) {
+            console.log("Iguak");
+            isAlready = true
         }
     });
+
+    return isAlready;
 }
 
 function clearInputs() {
-    document.getElementById("name").value == ""
-    document.getElementById("birthdate").value == ""
-    document.getElementById("address").value == ""
-    document.getElementById("phone") == ""
-    document.getElementById("email").value == ""
-    document.getElementById("cpf").value == "";
+    document.getElementById("name").value = "";
+    document.getElementById("birthdate").value = "";
+    document.getElementById("address").value = "";
+    document.getElementById("phone").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("cpf").value = "";
 }
 
 function showUsers() {
@@ -206,18 +212,23 @@ function showRegister() {
 }
 
 function showList() {
-    document.getElementById("user-list").classList.add("list-eachUser")
+    let list = "";
     arrayUsers.listUsers.forEach(user => {
-        document.getElementById("user-list").innerHTML = `
-            Nome: ${user.name}
-            Idade: ${user.age}
-            Signo: ${user.sign}
-            Endereço: ${user.city}
-            Celular: ${formatedCellphone(user.cell)}
-            CPF: ${formatedCPF(user.cpf)}
-            Possível cliente?: ${user.possible_Clien}
+        list += `
+            <div class = "list-eachUser">
+            <p><strong>Nome:</strong> ${user.name}</p>
+            <p><strong>Idade:</strong> ${user.age}</p>
+            <p><strong>Signo:</strong> ${user.sign}</p>
+            <p><strong>Endereço:</strong> ${user.city}</p>
+            <p><strong>Celular:</strong> ${formatedCellphone(user.cell)}</p>
+            <p><strong>CPF:</strong> ${formatedCPF(user.cpf)}</p>
+            <p><strong>Possível cliente?:</strong> ${user.possible_Client}</p>
+            </div>
         `
     });
+
+    document.getElementById("user-list").innerHTML = list;
+    document.getElementById("contador").innerHTML = `Contador: ${arrayUsers.countUsers()}`;
 }
 
 
